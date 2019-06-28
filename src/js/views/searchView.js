@@ -8,6 +8,8 @@ export const clearInput = () => {
 
 export const clearResults = () => {
     elements.searchResList.innerHTML = ''
+    elements.searchResPage.innerHTML = ''
+    
 }
 /** 'Pasta with tomato and spinach'
  * acc: 0 / acc + cur.length = 5 / newTitle = ['Pasta']
@@ -68,18 +70,17 @@ const createButton = (page, type) =>
 //Math.ceil  (4.1 = 5) , (3.2 = 4) , (1.5 = 2)
 
 const renderButtons = (page, numResults, resPerPage) => { 
-    let button
-    const pages = Math.ceil(numResults / resPerPage )
-    
-    if ( page === 1 && pages > 1){
-    // Only button to go to next page
-        button = createButton(page, 'next')
+    const pages = Math.ceil(numResults / resPerPage)
 
+    let button
+    if ( page === 1 && pages > 1){
+        // Only button to go to next page
+        button = createButton(page, 'next')
     } else if (page < pages){
         // Both buttons
-        button = `
-            ${createButton(page, 'next')}
+        button = ` 
             ${createButton(page, 'prev')}
+            ${createButton(page, 'next')}
         `
     } else if ( page === pages && pages > 1 ) { 
         // Only button to go to prev page
@@ -88,8 +89,7 @@ const renderButtons = (page, numResults, resPerPage) => {
     elements.searchResPage.insertAdjacentHTML('afterbegin', button)
 }
 
-export const renderResults = (recipes, page = 1, resPerPage = 10) => { 
-    
+export const renderResults = (recipes, page = 2, resPerPage = 10) => { 
     // render results of current page
     const start = (page - 1 ) * resPerPage
     const end = page * resPerPage

@@ -39,4 +39,14 @@ elements.searchForm.addEventListener('submit', e => {
     controlSearch()
 })
 
+// click btn for next and prev 
+elements.searchRes.addEventListener('click', e => { 
+    const btn = e.target.closest('.btn-inline')
+    if (btn) { 
+        const gotopage = parseInt((btn.dataset.goto), 10)
+        searchView.clearResults() 
+        searchView.renderResults((state.search.result), gotopage)
+    }
+    
+})
 
