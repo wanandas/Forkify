@@ -1,5 +1,8 @@
 import Search from './models/Search'
+import Recipe from './models/Recipe'
 import * as searchView from './views/searchView'
+import * as recipeView from './views/recipeView'
+
 import { elements, renderLoader, clearLoader } from './views/base'
 
 /** Global state of the app
@@ -8,8 +11,12 @@ import { elements, renderLoader, clearLoader } from './views/base'
  *  - Stopping object
  *  - Liked recipes
 */
-
 const state = {}
+
+
+/**
+ *  SEARCH CONTROLLER
+ */
 
 const controlSearch = async () => { 
     // 1) Get query from view
@@ -24,13 +31,19 @@ const controlSearch = async () => {
         searchView.clearInput()
         searchView.clearResults()
         renderLoader(elements.searchRes)
-        
-        // 4) Search for recipes
-        await state.search.getResults()
 
-        // 5) Render results on UI
-        clearLoader()
-        searchView.renderResults(state.search.result)
+        try{
+
+            // 4) Search for recipes
+            await state.search.getResults()
+    
+            // 5) Render results on UI
+            clearLoader()
+            searchView.renderResults(state.search.result)
+        } catch(err) { 
+            console.log('Something wrong with the search ...!!!!!!')
+            clearLoader()
+        }
     }
 }
 
@@ -38,6 +51,8 @@ elements.searchForm.addEventListener('submit', e => {
     e.preventDefault()
     controlSearch()
 })
+
+
 
 // click btn for next and prev 
 elements.searchRes.addEventListener('click', e => { 
@@ -49,4 +64,51 @@ elements.searchRes.addEventListener('click', e => {
     }
     
 })
+
+////////////////////////////////
+/**
+ *  RECIPE CONTROLLER
+ */
+const controlRecipe = async () => { 
+    // Get ID from url
+    const id = window.location.hash.replace('#','')
+    console.log(id)
+
+    if (id) { 
+        // Prepare UI changes
+        recipeView.clearRecipe()
+        renderLoader(elements.recipe)
+
+        //Create new recipe object 
+        state.recipe = new Recipe(id)
+
+        // Highlight selected search item
+        if (state.search) searchView.highlightSelector(id)
+
+        try { 
+            // Get recipe data and parse Ingredients
+            await state.recipe.getRecipe()
+            state.recipe.parseIngredients()
+
+            // Calculate servings and time 
+            state.recipe.calcTime()
+            state.recipe.calcServings()
+
+            // Render recipe
+            clearLoader()
+            recipeView.renderRecipe(state.recipe)
+        } catch (err){ 
+            console.log(err)
+            alert('ERROR PROCESSING RECIPE !!!!!!!!!!!!')
+            
+        }
+   
+    }
+}
+
+// How to add the same event listener to multiple events
+// window.addEventListener('hashchange', controlReicpe)
+// window.addEventListener('load', contro)
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
+
 
